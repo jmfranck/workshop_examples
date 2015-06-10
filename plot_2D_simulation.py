@@ -1,10 +1,8 @@
-#import matplotlib
-#matplotlib.use('WxAgg')
-#matplotlib.interactive(True)
 from pyspecdata import *
 from mayavi import mlab
 import re
-fp = open('simss11.tst','r')
+
+fp = open('TMPDMP17.fit','r')
 datalist = []
 thisshape = [0,0]
 thisdimnames = ["",""]
@@ -35,7 +33,9 @@ data = nddata(datalist,thisshape,thisdimnames)
 for j in [0,1]:
     data.setaxis(thisdimnames[j],1e6*(start1 + step1*r_[0:ndshape(data)[thisdimnames[j]]])) # 1e6 for MHz
     data.set_units(thisdimnames[j],'Hz')
-fl = figlist_var(mlab = mlab)
+#fl = figlist_var(mlab = mlab)
+fl = figlist_var()
 fl.next('2D simulation')
+#data = data['f1':(-60e6,70e6)]['f2':(-70e6,60e6)]
 fl.mesh(data)
 fl.show('test_mlab_140717.png')

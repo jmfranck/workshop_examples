@@ -18,12 +18,11 @@ n_nu = 200
 beta = 5.4
 multiplier = 1/1.5167e-3*100/234*17
 scaling_factor = 1.
-scaleup_freq = 2
 nu_sweep = 100e6
 nu_plot = 1.5*nu_sweep
 B1_inv = 48e6/scaling_factor
 B1_exc = 9.6/48.*B1_inv
-tau_pulse = 620e-9*(scaling_factor**2)
+tau_pulse = 120e-9*(scaling_factor**2)
 #(28.1175e9/1e4)
 print 'nu_sweep',nu_sweep, 'B1_exc',B1_exc, 'B1_inv',B1_inv, 'tau_pulse',tau_pulse
 t_steps = 500
