@@ -4,13 +4,14 @@ from pyspecdata import *
 from pyspecdata.prop import *
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
+from pylab import figure
+rc('font',size=18)
 I_z = 0.5*array([[1,0],[0,-1]],dtype='complex128')
 E = array([[1,0],[0,1]],dtype='complex128')
 I_x = 0.5*array([[0,1],[1,0]],dtype='complex128')
 I_y = 0.5*array([[0,1j],[-1j,0]],dtype='complex128')
 I_p = array([[0,1],[0,0]],dtype='complex128')
 # note that i can test fortran order with .flags, and that it has no effect on 1D arrays!
-fl = figlist()
 
 n_nu = 200
 
@@ -22,7 +23,7 @@ nu_sweep = 100e6
 nu_plot = 1.5*nu_sweep
 B1_inv = 48e6/scaling_factor
 B1_exc = 9.6/48.*B1_inv
-tau_pulse = 120e-9*(scaling_factor**2)
+tau_pulse = 620e-9*(scaling_factor**2)
 #(28.1175e9/1e4)
 print 'nu_sweep',nu_sweep, 'B1_exc',B1_exc, 'B1_inv',B1_inv, 'tau_pulse',tau_pulse
 t_steps = 500
@@ -62,11 +63,16 @@ complex_form2[t<pulse_center - tau_pulse/2] = 0
 complex_form2[t>pulse_center + tau_pulse/2] = 0
 #}}}
 complex_form = complex_form1 + complex_form2 # the overlay of the two pulses
-fl.next('waveforms')
+
+fig = figure(figsize = (10,15))
+fig.subplots_adjust(left=0.15)
+fig.subplots_adjust(right=0.95)
+fig.subplots_adjust(hspace=0.4)
+
+subplot(3,1,1)
 plot(abs(complex_form)/fpg,'k',linewidth=3)
 plot(abs(complex_form1)/fpg,'r',linewidth=1.5)
 plot(abs(complex_form2)/fpg,'b',linewidth=1.5)
-fl.next('coherence')
 t_dep = array([r_[(fmod+fmod1)] , r_[abs(complex_form)] , r_[ones(shape(t))]]) * tau_pulse / t_steps
 operators = array([I_z          , I_x                   , I_z])
 parameters = (array([1.])       , array([1.])           , nu_offset) # these need to have the same number of dimensions as the full parameter grid
@@ -80,24 +86,13 @@ rho = sandwich(U[:,:,:,:],
 #}}}
 signal = lvdot(rho,I_p)
 signal_mask = abs(signal)
-image(abs(signal),
+subplot(3,1,2)
+image(2*abs(signal),
 		x=t_axis/1e-9,y=nu_offset/1e6)
 xlabel(r't / $ns$')
 ylabel(r'$\Omega$ / 2 $\pi\;MHz$')
 title('Magnitude of coherence')
-fl.next('signal_complex')
-image(signal,
-		x=t_axis/1e-9,y=nu_offset/1e6)
-xlabel(r't / $ns$')
-ylabel(r'$\Omega$ / 2 $\pi\;MHz$')
-title('complex coherence')
-fl.next('inversion')
-image(abs(lvdot(rho,I_z)),
-		x=t_axis/1e-9,y=nu_offset/1e6)
-xlabel(r't / $ns$')
-ylabel(r'$\Omega$ / 2 $\pi\;MHz$')
-title('inversion')
-fl.next('signal')
+subplot(3,1,3)
 plotfunc = angle(lvdot(rho,I_p))
 plotfunc = diff(plotfunc,axis=0)**2
 plotfunc = -log(abs(plotfunc))
@@ -112,4 +107,4 @@ ylabel(r'$\Omega$ / 2 $\pi\;MHz$')
 
 print 'nu_sweep',nu_sweep/1e6, 'MHz, B1_exc',B1_exc/1e6, 'MHz B1_inv',B1_inv/1e6,'MHz --> ',B1_inv/(28.1175e9/1e4),'G tau_pulse',tau_pulse/1e-9,'ns dt',dt*1e9,'ns'
 title('Signal Level (log of inverse of dispersion)')
-fl.show('prop_test_130215')
+show()
